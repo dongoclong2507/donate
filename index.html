@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dự Án Nuôi LONG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: #161616;
+        --surface-hover: #222222;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(255, 255, 255, 0.2);
+        --gold: #fbbf24;
+        --gold-glow: rgba(251, 191, 36, 0.15);
+        --text-main: #f5f5f5;
+        --text-muted: #a3a3a3;
+        --font: 'Plus Jakarta Sans', sans-serif;
+        --radius: 16px;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text-main);
+        font-family: var(--font);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 24px 16px;
+        -webkit-font-smoothing: antialiased;
+        background-image:
+        radial-gradient(circle at 50% 0%, var(--gold-glow) 0%, transparent 50%);
+        background-attachment: fixed;
+      }
+
+      .app { width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 20px; }
+
+      /* HEADER */
+      .header { text-align: center; padding: 10px 0; }
+      .header .tag {
+        display: inline-block; background: rgba(251, 191, 36, 0.1); color: var(--gold);
+        font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 6px 14px;
+        border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.2); margin-bottom: 12px;
+      }
+      .header h1 {
+        font-size: 28px; font-weight: 800; letter-spacing: 1px;
+        text-transform: uppercase; color: var(--text-main);
+        text-shadow: 0 0 20px rgba(255,255,255,0.1);
+      }
+      .header p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      }
+      .card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.5;
+      }
+
+      .qr-container {
+        background: #fff;
+        padding: 12px;
+        border-radius: 16px;
+        align-self: center;
+        box-shadow: 0 0 30px var(--gold-glow);
+        border: 2px solid var(--gold);
+        transition: 0.3s;
+        position: relative;
+      }
+      .qr-container img { width: 220px; height: 220px; display: block; object-fit: contain; border-radius: 8px; }
+
+      /* Loading overlay cho QR */
+      .qr-loading {
+        position: absolute; inset: 0; background: rgba(255,255,255,0.9);
+        display: none; justify-content: center; align-items: center;
+        border-radius: 14px; color: #000; font-weight: bold;
+      }
+      .qr-loading.show { display: flex; }
+      .qr-loading i { animation: spin 1s linear infinite; font-size: 24px; }
+      @keyframes spin { 100% { transform: rotate(360deg); } }
+
+      .info-group { display: flex; flex-direction: column; gap: 10px; }
+
+      .info-row {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.2s;
+      }
+      .info-row:hover { background: rgba(255,255,255,0.05); border-color: var(--border-hover); }
+
+      .info-label { font-size: 11px; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 4px; text-transform: uppercase; }
+      .info-value { font-size: 15px; color: var(--text-main); font-weight: 700; font-family: monospace; letter-spacing: 0.5px; }
+      .info-value.highlight { color: var(--gold); }
+
+      .btn-copy {
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: #fff;
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: flex; justify-content: center; align-items: center;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-copy:hover { background: var(--gold); color: #000; }
+      .btn-copy:active { transform: scale(0.9); }
+
+      .amount-section {
+        background: rgba(0,0,0,0.4);
+        border: 1px dashed var(--border-hover);
+        border-radius: 16px;
+        padding: 16px;
+      }
+      .amount-title { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 12px; text-align: center; }
+
+      .input-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .input-wrap i { position: absolute; left: 16px; color: var(--text-muted); font-size: 16px; }
+      .input-wrap input {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border-hover);
+        color: var(--gold);
+        font-size: 20px; font-weight: 700; font-family: monospace;
+        padding: 16px 50px 16px 44px;
+        border-radius: 12px;
+        outline: none;
+        transition: 0.2s;
+      }
+      .input-wrap input:focus { border-color: var(--gold); box-shadow: 0 0 15px var(--gold-glow); }
+      .input-wrap input::placeholder { color: #555; font-size: 16px; font-family: var(--font); font-weight: 500; }
+
+      .unit { position: absolute; right: 16px; color: var(--text-muted); font-weight: 700; font-size: 16px; }
+
+      .btn-generate {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+      }
+      .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5); }
+      .btn-generate:active { transform: scale(0.98); }
+
+      .footer { text-align: center; padding: 10px 0; }
+      .footer p { font-size: 12px; color: #555; font-weight: 600; letter-spacing: 1px; }
+
+      #toast {
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+        background: var(--gold); color: #000; padding: 12px 24px; border-radius: 30px;
+        font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px;
+        box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3); opacity: 0; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 9999; pointer-events: none;
+      }
+      #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    </style>
+  </head>
+  <body>
+
+    <div class="app">
+
+      <header class="header">
+        <div class="tag">PROJECT 2507</div>
+        <h1>Dự Án Nuôi LONG</h1>
+        <p>Ủng hộ LONG để có thêm động lực phát triển!</p>
+      </header>
+
+      <div class="card">
+        <div class="qr-container">
+          <img id="qrImage" src="https://cdn.phototourl.com/member/2026-11-16-33d0e431-1771-4cd7-9ffa-4287a487d44f.jpg" alt="QR Chuyển Khoản" onerror="this.src='https://placehold.co/220x220/fff/000?text=QR+Code'">
+          <div class="qr-loading" id="qrLoading"><i class="fa-solid fa-spinner"></i></div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-row">
+            <div>
+              <span class="info-label">SỐ TÀI KHOẢN</span>
+              <div class="info-value" id="stk-value">10006441478</div>
+            </div>
+            <button class="btn-copy" onclick="copyText('10006441478', 'Đã copy STK!')"><i class="fa-regular fa-copy"></i></button>
+          </div>
+
+          <div class="info-row">
+            <div>
+              <span class="info-label">TÊN TÀI KHOẢN</span>
+              <div class="info-value">DO NGOC LONG</div>
+            </div>
+            <button class="btn-copy" onclick="copyText('DONGOCLONG', 'Đã copy Tên TK!')"><i class="fa-regular fa-copy"></i></button>
+          </div>
+
+          <div class="info-row">
+            <div>
+              <span class="info-label">NỘI DUNG CHUYỂN KHOẢN</span>
+              <div class="info-value highlight" id="content-value">DUANNUOIDOLONG2507</div>
+            </div>
+            <button class="btn-copy" onclick="copyText('DUANNUOIDOLONG2507', 'Đã copy Nội dung!')"><i class="fa-regular fa-copy"></i></button>
+          </div>
+        </div>
+
+        <div class="amount-section">
+          <div class="amount-title">Nhập số tiền bạn muốn ủng hộ</div>
+          <div class="input-wrap">
+            <i class="fa-solid fa-money-bill-wave"></i>
+            <input type="text" id="amountInput" placeholder="Nhập số tiền..." oninput="formatAmount(this)" onkeypress="if(event.key === 'Enter') generateQR()">
+            <span class="unit">VNĐ</span>
+          </div>
+
+          <button class="btn-generate" onclick="generateQR()">
+            <i class="fa-solid fa-qrcode"></i> TẠO MÃ QR THANH TOÁN
+          </button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>CẢM ƠN BẠN ĐÃ ỦNG HỘ LONG!</p>
+      </div>
+    </div>
+
+    <div id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Thành công!</span></div>
+
+    <script>
+
+      function copyText(text, msg) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(msg);
+        }).catch(err => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            showToast(msg);
+        });
+      }
+
+
+      let toastTimer;
+      function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        toast.classList.add('show');
+
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+          }, 2000);
+      }
+
+
+      function formatAmount(input) {
+        let val = input.value.replace(/\D/g, '');
+        if (val) {
+          input.value = parseInt(val, 10).toLocaleString('en-US');
+        }
+      }
+
+      function generateQR() {
+        const amountInput = document.getElementById('amountInput').value;
+
+
+        const amountStr = amountInput.replace(/,/g, '');
+        const amount = parseInt(amountStr, 10);
+
+        if (!amount || amount <= 0) {
+          showToast("Vui lòng nhập số tiền hợp lệ!");
+          document.getElementById('amountInput').focus();
+          return;
+        }
+
+        const qrImg = document.getElementById('qrImage');
+        const loading = document.getElementById('qrLoading');
+
+        loading.classList.add('show');
+
+        const bankBin = '970423'; 
+        const accountNo = '10006441478';
+        const accountName = 'DO NGOC LONG';
+        const addInfo = 'DUANNUOIDOLONG2507';
+
+        const qrUrl = `https://img.vietqr.io/image/${bankBin}-${accountNo}-compact2.png?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`;
+
+        qrImg.src = qrUrl;
+
+        qrImg.onload = () => {
+          loading.classList.remove('show');
+          showToast(`Đã tạo QR ủng hộ ${amount.toLocaleString('en-US')}đ!`);
+        };
+
+        qrImg.onerror = () => {
+          loading.classList.remove('show');
+          showToast("Lỗi tạo mã QR, vui lòng thử lại!");
+        };
+      }
+
+    </script>
+
+  </body>
+</html>
